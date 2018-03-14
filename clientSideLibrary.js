@@ -1,23 +1,59 @@
-const IP = // IP
-
-/* xml http request
-
-xhr.open("POST", url, true);
-xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-xhr.send(someStuff);
-
-That code would post someStuff to url. Just make sure that when you create your 
-XMLHttpRequest object, it will be cross-browser compatible. There are endless examples out there of how to do that.
+const urlEndPoint = "http://10.219.218.238:8080/api"; // url
 
 /*
+Links:
+https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+*/
+
+
+
+/* functions to implement
+
+authenticate
+
+POS system:
+get order by table number
+
+
+waiter/waitress:
+get all dishes (by category, by alphabetical order, by )
+add order to database
+
+Kitchen:
+assign order complete
+delete order from database
+
+
 
 */
 
-module.exports = {
 
-	//
-	sendRequest: function() {
-		return "HELLO";
+// library example
+/*
+var orderSoftClient = {
+	_request : function () { // server request helper function
+		encodeURI
+	},
+	getOrderFromTableNum : function (tableNum) {
+		// using tableNum get orderedDishes record
+	},
 
+}
+*/
 
-};
+// less retarded library
+
+// function for fetching from server
+function getThing(thingToGet) {
+	fetch(ip + thingToGet, { method: "POST" }).then(response => {
+		thingGotten = response
+	})
+
+	return thingGotten
+}
+
+var orderSoftClient = {
+	getOrderFromTableNum : function (tableNum) {
+		
+	}
+}
