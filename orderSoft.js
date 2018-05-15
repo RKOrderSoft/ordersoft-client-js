@@ -43,17 +43,82 @@ var orderSoftClient = {
 
 // less retarded library
 
-// function for fetching from server
-function getThing(thingToGet) {
-	fetch(ip + thingToGet, { method: "POST" }).then(response => {
-		thingGotten = response
-	})
+// helper function for fetching from server
+function requestFromServer(funct, body) {
 
-	return thingGotten
+	var toSend = body;
+
+	fetch(ip + "/" + funct, {
+		method: "POST",
+		body: body
+	}).then(response => {
+		return response;
+	});
 }
 
 var orderSoftClient = {
-	getOrderFromTableNum : function (tableNum) {
-		
+	/*authenticate : function () {
+
+		fetch(ip + "/api/login", {
+			method : "POST"
+		})
+
+	},*/
+
+	getOrder : function (tableNum) {
+
+		var toSend = { "tableNum" : tableNum };
+
+		fetch(ip + "/getorder", { 
+			method : "POST", 
+			body : JSON.stringify(toSend)
+		}).then(response => {
+			order = JSON.parse(response);
+			console.log(order); // debugging output
+		});
+
+		return order;
+	},
+
+	submitOrder : function (order) {
+
+		fetch(ip + "/submitOrder", {
+			method : "POST",
+			body : JSON.stringify(order)
+		}).then(response => {
+			status = JSON.parse(response); // "OK", "INVALID FORMAT", "UNAUTHORISED", "COOKIE EXPIRED"
+ 			console.log(status); // debugging output
+		})
+
+		return status;
+	},
+
+	editOrder : function (tableNum, item, change) {
+
+		var toSend = {
+			"tableNum" : tableNum,
+			"itemToChange" : item,
+			"change" : change
 	}
+
+		fetch(ip + "/changeOrder", {
+			method: "POST",
+			body : JSON.stringify(toSend)
+		}).then(response => {
+			status = JSON.parse(response) // "OK", "INVALID FORMAT", "ORDER NOT FOUND", "COOKIE EXPIRED"
+		})
+	},
+
+	markOrderMade : function (tableNum) {
+
+		var toSend = { "tableNum" : tableNum }
+
+		fetch(ip + "/markOrderMade", {
+			method : "POST",
+			body : JSON.stringify(toSend)
+		})
+
+	}
+
+
 }
