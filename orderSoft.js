@@ -1,124 +1,110 @@
-const urlEndPoint = "http://10.219.218.238:8080/api"; // url
-
-/*
-Links:
-https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
-*/
-
-
-
-/* functions to implement
-
-authenticate
-
-POS system:
-get order by table number
-
-
-waiter/waitress:
-get all dishes (by category, by alphabetical order, by )
-add order to database
-
-Kitchen:
-assign order complete
-delete order from database
-
-
-
-*/
-
-
-// library example
-/*
-var orderSoftClient = {
-	_request : function () { // server request helper function
-		encodeURI
-	},
-	getOrderFromTableNum : function (tableNum) {
-		// using tableNum get orderedDishes record
-	},
-
-}
-*/
-
-// less retarded library
+const urlEndPoint = "http://192.168.43.218:8080/api"; // url
+const client = "js";
+const status_OK = "OK";
+const status_INVALID = "INVALID";
+const status_SESSION_EXPIRED = "SESSION_EXPIRED";
+const status_UNAUTHORISED = "UNAUTHORISED";
 
 // helper function for fetching from server
+// funct is string, body is javascript object
 function requestFromServer(funct, body) {
 
-	var toSend = body;
+	var toSend = JSON.stringify(body);
 
-	fetch(ip + "/" + funct, {
+	fetch(urlEndPoint + "/" + funct, {
 		method: "POST",
-		body: body
+		body: toSend
 	}).then(response => {
-		return response;
+		return JSON.parse(response);
 	});
 }
 
-var orderSoftClient = {
-	/*authenticate : function () {
+class orderSoftClient {
 
-		fetch(ip + "/api/login", {
-			method : "POST"
+	constructor() {
+		this._sessionID;
+	}
+
+	// authentication method
+	authenticate(username, password) {
+		fetch(urlEndPoint + "/test", {
+			method : "POST",
+			headers: {
+				"content-type": "application/json"
+			},
+			body : {
+				"client" : client
+			}
+		}).then(response => {
+			console.log(response.json());
+			return fetch(urlEndPoint + "/login", {
+				method : "POST",
+				body : {
+					"username" : username,
+					"password" : password
+				}
+			}).then(response => {
+				if (response.status == status_OK) {
+					this._sessionID = response;
+					return true;
+				} else if (response.status == status_INVALID) {
+					console.log("authentication invalid"); // debugging output
+					console.log(response.reason); // reason for invalid authentication
+					return false;
+				} else if (response.status == status_SESSION_EXPIRED) {
+					console.log("authentication session expired"); // debugging output
+					return false;
+				} else if (response.status == status_UNAUTHORISED) {
+					console.log("authentication unauthorised"); // debugging output
+					return false;
+				} else {
+					console.log("i have no idea what happened, server screwed up");
+					return false;
+				}
+			})
 		})
+	}/*,
 
-	},*/
-
-	getOrder : function (tableNum) {
-
+	getOrder(tableNum) {
 		var toSend = { "tableNum" : tableNum };
 
-		fetch(ip + "/getorder", { 
-			method : "POST", 
-			body : JSON.stringify(toSend)
-		}).then(response => {
-			order = JSON.parse(response);
-			console.log(order); // debugging output
-		});
+		response = requestFromServer("getOrder", toSend);
+		console.log(response); // order as javascript object
+		return response;
+	}
 
-		return order;
-	},
+	submitOrder(order) {
+		response = requestFromServer("submitOrder", order);
+		console.log(response.status); // probably doesn't work
+	}
 
-	submitOrder : function (order) {
-
-		fetch(ip + "/submitOrder", {
-			method : "POST",
-			body : JSON.stringify(order)
-		}).then(response => {
-			status = JSON.parse(response); // "OK", "INVALID FORMAT", "UNAUTHORISED", "COOKIE EXPIRED"
- 			console.log(status); // debugging output
-		})
-
-		return status;
-	},
-
-	editOrder : function (tableNum, item, change) {
-
+	editOrder(tableNum, item, change) {
 		var toSend = {
 			"tableNum" : tableNum,
 			"itemToChange" : item,
 			"change" : change
 	}
 
-		fetch(ip + "/changeOrder", {
-			method: "POST",
-			body : JSON.stringify(toSend)
-		}).then(response => {
-			status = JSON.parse(response) // "OK", "INVALID FORMAT", "ORDER NOT FOUND", "COOKIE EXPIRED"
-		})
-	},
-
-	markOrderMade : function (tableNum) {
-
-		var toSend = { "tableNum" : tableNum }
-
-		fetch(ip + "/markOrderMade", {
-			method : "POST",
-			body : JSON.stringify(toSend)
-		})
+		response = requestFromServer("editOrder", toSend);
+		console.log(response.status); // probably doesn't work
 
 	}
 
+	markOrderMade(tableNum) {
+		var toSend = { "tableNum" : tableNum };
+
+		response = requestFromServer("markOrderMade", toSend);
+		console.log(response.status) // probably doesn't work
+
+	}
+
+	//markDishMade(tableNum, dish) {}
+
+	//markOrderPaid(tableNum, )
+
+	*/
 
 }
+
+const kitchen = new orderSoftClient();
+kitchen.authenticate("name", "jeff");
