@@ -6,18 +6,23 @@ const status_SESSION_EXPIRED = "SESSION_EXPIRED";
 const status_UNAUTHORISED = "UNAUTHORISED";
 
 // helper function for fetching from server
-// funct is string, body is javascript object
-function requestFromServer(funct, body) {
+// postURL is string, body is javascript object
 
-	var toSend = JSON.stringify(body);
-
-	fetch(urlEndPoint + "/" + funct, {
-		method: "POST",
-		body: toSend
+function requestFromServer(postUrl, body) {
+	return fetch(urlEndPoint + "/" + postUrl, {
+		method : "POST",
+		headers : {
+			"content-type" : "application/json"
+		},
+		body : JSON.stringify(body)
 	}).then(response => {
-		return JSON.parse(response);
-	});
+		return response.json();
+	}).then(resp => {
+		return JSON.parse(resp);
+	})
 }
+
+
 
 class orderSoftClient {
 
@@ -25,45 +30,55 @@ class orderSoftClient {
 		this._sessionID;
 	}
 
-	// authentication method
-	authenticate(username, password) {
-		fetch(urlEndPoint + "/test", {
-			method : "POST",
-			headers: {
-				"content-type": "application/json"
-			},
-			body : {
-				"client" : client
+	// getters and setters
+	get sessionID() {
+		return this._sessionID;
+	}
+
+	testPost() {
+		var test = {
+			"client" : client
+		}
+
+		requestFromServer("test", test).then(resp => {
+			if (response.status = "OK") {
+				console.log("Test Post Successful")
 			}
-		}).then(response => {
-			console.log(response.json());
-			return fetch(urlEndPoint + "/login", {
-				method : "POST",
-				body : {
-					"username" : username,
-					"password" : password
-				}
-			}).then(response => {
-				if (response.status == status_OK) {
-					this._sessionID = response;
-					return true;
-				} else if (response.status == status_INVALID) {
-					console.log("authentication invalid"); // debugging output
-					console.log(response.reason); // reason for invalid authentication
-					return false;
-				} else if (response.status == status_SESSION_EXPIRED) {
-					console.log("authentication session expired"); // debugging output
-					return false;
-				} else if (response.status == status_UNAUTHORISED) {
-					console.log("authentication unauthorised"); // debugging output
-					return false;
-				} else {
-					console.log("i have no idea what happened, server screwed up");
-					return false;
-				}
-			})
 		})
-	}/*,
+	}
+
+	authenticate(username, password) {
+
+		var loginDetails = {
+			"client" : client,
+			"username" : username,
+			"password" : password
+		}
+
+		requestFromServer("login", loginDetails).then(resp => {
+			if (resp.status == status_OK) {
+				this._sessionID = resp.sessionId;
+				console.log("duude it worked hooly");
+				return true;
+			} else if (resp.status == status_INVALID) {
+				console.log("duude i think your format's invalid haha"); // debugging output
+				console.log(resp.reason); // reason for invalid authentication
+				return false;
+			} else if (resp.status == status_SESSION_EXPIRED) {
+				console.log("duude i think your authentication session expired haha"); // debugging output
+				return false;
+			} else if (resp.status == status_UNAUTHORISED) {
+				console.log("hooly, you realise you're not actually authorised right? haha"); // debugging output
+				return false;
+			} else {
+				console.log("duude, eddie, the server's not working");
+				return false;
+			}
+		})
+	}
+
+
+	/*,
 
 	getOrder(tableNum) {
 		var toSend = { "tableNum" : tableNum };
@@ -106,5 +121,12 @@ class orderSoftClient {
 
 }
 
+
+
+
 const kitchen = new orderSoftClient();
-kitchen.authenticate("name", "jeff");
+
+kitchen.testPost();
+
+kitchen.authenticate("jason", "jason");
+
