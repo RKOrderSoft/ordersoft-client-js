@@ -22,6 +22,22 @@ function requestFromServer(postUrl, body) {
 	})
 }
 
+// given a response will check the status
+function handleResponse(resp) {
+	respStatus = "";
+	if (resp.status == status_OK) {
+		respStatus = "duude it worked hooly";
+	} else if (resp.status == status_INVALID) {
+		respStatus = "duude i think your format's invalid haha";
+	} else if (resp.status == status_SESSION_EXPIRED) {
+		respStatus = "duude i think your authentication session expired haha";
+	} else if (resp.status == status_UNAUTHORISED) {
+		respStatus = "hooly, you realise you're not actually authorised right?";
+	} else {
+		respStatus = "i have no idea what the status is haha. maybe ask eddie or something idk";
+	}
+}
+
 
 
 class orderSoftClient {
@@ -56,6 +72,7 @@ class orderSoftClient {
 		}
 
 		requestFromServer("login", loginDetails).then(resp => {
+			
 			if (resp.status == status_OK) {
 				this._sessionID = resp.sessionId;
 				console.log("duude it worked hooly");
@@ -78,20 +95,30 @@ class orderSoftClient {
 	}
 
 
-	/*,
-
 	getOrder(tableNum) {
-		var toSend = { "tableNum" : tableNum };
+		var objectToSend = { 
+			"client" : client,
+			"sessionId" : this._sessionID,
+			"tableNum" : tableNum
+		};
 
-		response = requestFromServer("getOrder", toSend);
+		response = requestFromServer("getOrder", objectToSend);
 		console.log(response); // order as javascript object
 		return response;
 	}
 
-	submitOrder(order) {
-		response = requestFromServer("submitOrder", order);
-		console.log(response.status); // probably doesn't work
+	submitOrder(tableNum, order) {
+		var objectToSend = {
+			"client" : client,
+			"sessionId" : this._sessionID,
+			"tableNum" : tableNum,
+			"order" : order
+		};
+		response = requestFromServer("submitOrder", objectToSend);
+		console.log(response.status);
 	}
+
+	/*
 
 	editOrder(tableNum, item, change) {
 		var toSend = {
