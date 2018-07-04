@@ -38,11 +38,11 @@ class orderSoftClient {
 
 
 	// given the URL and body
-	requestFromServer(postUrl, body) {
+	requestFromServer(postUrl, body, type) {
 		var status;
 
 		return fetch(urlEndPoint + "/" + postUrl, {
-			method : "POST",
+			method : type,
 			headers : {
 				"content-type" : "application/json",
 				"client" : client,
@@ -57,7 +57,7 @@ class orderSoftClient {
 			if (status == 200) { 				// if status is OK
 				return JSON.parse(resp);
 			} else { 							// if status is not 200/not OK
-				if (reason == undefined) { // if server gave no reason
+				if (reason == undefined) { 		// if server gave no reason
 					throw status + " no reason"
 				} else { 						// if server gave reason
 					throw status + " " + reason;
@@ -91,110 +91,112 @@ class orderSoftClient {
 	}*/
 
 
-
+	// DONE
+	// TESTED
 	testPost() {
 		var test = {
 			"test" : true
 		};
 
-		this.requestFromServer("test", test).then(resp => {
-			console.log("Test post successful");
-			return resp;
-		});
+		return this.requestFromServer("test", test, "POST");
 	}
 
 
 
-	// given a username and password returns status
+	// given a username and password returns response from server
+	// if login is successful then the session ID and access level
+	// will be set
+	// NOT DONE
+	// NOT TESTED
 	authenticate(username, password) {
-
 		var loginDetails = {
 			"username" : username,
 			"password" : password
 		};
 
-		var toReturn = "";
 
-		this.requestFromServer("login", loginDetails).then(resp => {
+		this.requestFromServer("login", loginDetails, "POST").then(resp => {
 			this._sessionID = resp.sessionId;
 			this._accessLevel = resp.accessLevel;
-			console.log("Login successful");
 		});
 	}
 
 
 
-	// given tableNum, returns
-	// response from server
-	getOrder(tableNum) {
-		var objectToSend = {
-			"tableNum" : tableNum
-		};
-
-		requestFromServer("getOrder", objectToSend).then(resp => {
-			status = handleResponse(resp);
-			console.log("gerOrder status:");
-			console.log(status); // prints status of response
-			return resp;
-		});
-	}
-
-
-
-	// given tableNum and the order as a javascript object, returns
-	// response from server
-	submitOrder(tableNum, order) {
-		var objectToSend = {
-			"tableNum" : tableNum,
-			"order" : order
-		};
-
-		requestFromServer("submitOrder", objectToSend).then(resp => {
-			status = handleResponse(resp);
-			console.log("submitOrder status:");
-			console.log(status);
-			return resp;
-		});
-	}
-
-	
-
-	// given tableNum and item to change, will change it to "change"
-	editOrder(tableNum, item, change) {
-		var objectToSend = {
-			"tableNum" : tableNum,
-			"itemToChange" : item,
-			"change" : change
+	// given a reference of either "tableNum" or "orderId" and then
+	// the reference number, returns response from server
+	// DONE
+	// NOT TESTED
+	getOrder(reference, referenceNum) {
+		if (reference == "tableNum") {
+			var objToSend = {
+				"tableNum" : referenceNum
+			}
+		} else if (reference = "orderId") {
+			var objToSend = {
+				"orderId" : referenceNum
+			}
+		} else {
+			throw "must specify 'tableNum' or 'orderId' in first parameter";
 		}
 
-		requestFromServer("editOrder", objectToSend).resp(then => {
-			status = handleResponse(resp);
-			console.log("edirOrder status:");
-			console.log(status);
+		return this.requestFromServer("order", objToSend, "GET");
+		/*requestFromServer("order", objectToSend).then(resp => {
 			return resp;
-		});
+		});*/
+	}
+
+	/*
+	incorporates both change and submit order
+	given an order in JSON, will change/submit order to database
+	if tableNum or orderId is not in the database, will make a new
+	order. if tableNum or orderId is already in the database, will
+	change the order. returns response from server
+	*/
+	submitOrder(order) {
+		// error handling
+		var undef = false
+		if (order.tableNum == undefined) {
+			undef = true
+		} else if (order.orderId != undefined) {
+			undef = false
+		} else {
+			undef = false
+		}
+		if (undef == true) {
+			throw "orderId or tableNum must be defined in order";
+		}
+
+		return requestFromServer("order", order, "POST");
 	}
 
 
 
-	//
-	markOrderMade(tableNum) {
-		var objectToSend = {
-			"tableNum" : tableNum
-		};
+	// given a reference of either "tableNum" or "orderId" and then
+	// the reference number, returns response from server
+	// NOT DONE, might be exact same as submitOrder?
+	// NOT TESTED
+	markOrderMade(reference, referenceNum) {
+		if (reference == "tableNum") {
+			var objToSend = {
+				"tableNum" : referenceNum
+			}
+		} else if (reference = "orderId") {
+			var objToSend = {
+				"orderId" : referenceNum
+			}
+		} else {
+			throw "must specify 'tableNum' or 'orderId' in first parameter";
+		}
 
-		requestFromServer("markOrderMade", objectToSend).then(resp => {
-			status = handleResponse(resp);
-			console.log("markOrderMade status:");
-			console.log(status);
-			return resp;
-		});
-
+		requestFromServer("order", objToSend, "POST");
 	}
 
 
 
-	// 
+	// might not need this? not in data dict
+	// NOT DONE
+	// NOT TESTED
 	markDishMade(tableNum, dish) {
 		var objectToSend = {
 			"tableNum" : tableNum,
@@ -211,7 +213,8 @@ class orderSoftClient {
 
 
 
-	//
+	// NOT DONE, might not need as exact same as markorderdone
+	// NOT TESTED
 	markOrderPaid(tableNum) {
 		var objectToSend = {
 			"tableNum" : tableNum,
@@ -228,40 +231,39 @@ class orderSoftClient {
 
 
 
-	//
+	// returns all dishes in database
 	getDishes() {
-		var objectToSend = {
-		};
+		/*var objToSend {
+			"" : 
+		}*/
 
-		requestFromServer("getDishes", objectToSend).then(resp => {
-			status = handleResponse(resp);
-			console.log("getDishes status:");
-			console.log(status);
-			return resp;
-		});
+		return requestFromServer("dishes", objToSend, "GET");
 	}
 
 
 
-	//
-	addDish(name, price, sizes, category, description) {
-		var objectToSend = {
+	// adds dish to database given name, price, sizes, category
+	// description, multiOptions and singleOptions
+	// DONE
+	// NOT TESTED
+	addDish(name, price, sizes, category, description, /*image, */multiOptions, singleOptions) {
+		var objToSend = {
 			"name" : name,
 			"price" : price,
-			"description" : description
+			"sizes" : sizes,
+			"category" : category,
+			"description" : description,
+			"multiOptions" : multiOptions,
+			"singleOptions" :singleOptions
 		}
 
-		requestFromServer("addDish", objectToSend).then(resp => {
-			status = handleResponse(resp);
-			console.log("addDish status:");
-			console.log(status)
-			return resp;
-		});
+		return requestFromServer("dishes", objToSend, "POST");
 	}
 
 
 
-	//
+	// NOT DONE, might be same as editDish
+	// NOT TESTED
 	editDish(name, itemToChange, change) {
 		var objectToSend = {
 			"name" : name,
@@ -275,6 +277,20 @@ class orderSoftClient {
 			console.log(status);
 			return resp;
 		})
+
+
+	// KINDA DONE, may need security
+	// NOT TESTED
+	register(username, password) {
+		var objectToSend = {
+			"username" : username,
+			"password" : password
+		}
+
+		return requestFromServer("admin", objToSend, "POST");
+	}
+
+	
 	}
 }
 
@@ -282,8 +298,38 @@ class orderSoftClient {
 
 
 const kitchen = new orderSoftClient();
-kitchen.testPost()
-kitchen.authenticate("jason");
+kitchen.testPost().then(resp => {
+	console.log(resp);
+});
+
+var loggedIn = false;
+var error = false;
+var userName = prompt("username");
+var pw = prompt("pw");
+while (loggedIn == false) {
+	try {
+	error = false;
+	kitchen.authenticate(userName, pw);
+	}
+	catch(err) {
+		console.log(err);
+		error = true
+	}
+	finally {
+		if (error == true) {
+			username = prompt("username");
+			pw = prompt("pw");
+		} else {
+			loggedIn = true;
+		}
+	}
+}
+
+kitchen.authenticate("jason", "jason");
+/*kitchen.authenticate("jason");
+kitchen.getorder("tableNum", 31).then(resp => {
+	console.log(order);
+});*/
 
 //kitchen.authenticate("jason", "jason");
 
