@@ -8,23 +8,12 @@ const status_UNAUTHORISED = "UNAUTHORISED";
 // helper function for fetching from server
 // postURL is string, body is javascript object
 
-
-
-
-
-
-
-
-
-
-
 class orderSoftClient {
 
 	constructor() {
 		this._sessionID;
 		this._accessLevel;
 	}
-
 
 
 	// getters and setters
@@ -50,7 +39,7 @@ class orderSoftClient {
 			},
 			body : JSON.stringify(body)
 		}).then(resp => {
-			status = resp.status.toString()
+			status = resp.status.toString();
 			return resp.json();
 		}).then(resp => {
 			var reason = JSON.parse(resp).reason;
@@ -70,26 +59,6 @@ class orderSoftClient {
 			return JSON.parse(resp);
 		})*/
 	}
-
-
-	// given a response will check the status
-	/*
-	handleResponse(resp) {
-		var respStatus = "";
-		if (resp.status == status_OK) {
-			respStatus = "duude it worked hooly";
-		} else if (resp.status == status_INVALID) {
-			respStatus = "duude i think your format's invalid haha";
-		} else if (resp.status == status_SESSION_EXPIRED) {
-			respStatus = "duude i think your authentication session expired haha";
-		} else if (resp.status == status_UNAUTHORISED) {
-			respStatus = "hooly, you realise you're not actually authorised right?";
-		} else {
-			respStatus = "i have no idea what the status is haha. maybe ask eddie or something idk";
-		}
-		return respStatus;
-	}*/
-
 
 	// DONE
 	// TESTED
@@ -118,6 +87,21 @@ class orderSoftClient {
 		this.requestFromServer("login", loginDetails, "POST").then(resp => {
 			this._sessionID = resp.sessionId;
 			this._accessLevel = resp.accessLevel;
+			return resp;
+		}).catch((err) => {
+			return err;
+		});
+	}
+
+	// logs out
+	// NOT TESTED
+	logout() {
+		this.requestFromServer("logout", , "POST").then(resp => {
+			this._sessionID = undefined;
+			this._accessLevel = undefined;
+			return resp;
+		}).catch((err) => {
+			return err;
 		});
 	}
 
@@ -277,6 +261,7 @@ class orderSoftClient {
 			console.log(status);
 			return resp;
 		})
+	}
 
 
 	// KINDA DONE, may need security
@@ -288,9 +273,6 @@ class orderSoftClient {
 		}
 
 		return requestFromServer("admin", objToSend, "POST");
-	}
-
-	
 	}
 }
 
@@ -308,14 +290,12 @@ var userName = prompt("username");
 var pw = prompt("pw");
 while (loggedIn == false) {
 	try {
-	error = false;
-	kitchen.authenticate(userName, pw);
-	}
-	catch(err) {
+		error = false;
+		kitchen.authenticate(userName, pw);
+	} catch(err) {
 		console.log(err);
 		error = true
-	}
-	finally {
+	} finally {
 		if (error == true) {
 			username = prompt("username");
 			pw = prompt("pw");
@@ -332,4 +312,3 @@ kitchen.getorder("tableNum", 31).then(resp => {
 });*/
 
 //kitchen.authenticate("jason", "jason");
-
