@@ -130,6 +130,11 @@ class orderSoftClient {
 		});*/
 	}
 
+	openOrders() {
+		objToSend = {}
+		return this.requestFromServer("order", objToSend, "POST");
+	}
+
 	/*
 	incorporates both change and submit order
 	given an order in JSON, will change/submit order to database
@@ -304,7 +309,19 @@ while (loggedIn == false) {
 		}
 	}
 }
-
+/* HENRY uSE THIS
+	orders = [];
+	kitchen.openOrders().then(resp => {
+		resp.forEach(element => {
+			kitchen.getOrder("orderID", element).then(resp => {
+				orders.push(resp);
+			});
+		});
+	}
+} catch(err) {
+	console.log(err);
+}
+*/
 kitchen.authenticate("jason", "jason");
 /*kitchen.authenticate("jason");
 kitchen.getorder("tableNum", 31).then(resp => {
