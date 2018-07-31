@@ -281,9 +281,9 @@ class orderSoftClient {
 	}
 }
 
+// testing below
 
-
-
+/*
 const kitchen = new orderSoftClient();
 kitchen.testPost().then(resp => {
 	console.log(resp);
@@ -309,6 +309,8 @@ while (loggedIn == false) {
 		}
 	}
 }
+*/
+
 /* HENRY uSE THIS
 	orders = [];
 	kitchen.openOrders().then(resp => {
@@ -322,7 +324,9 @@ while (loggedIn == false) {
 	console.log(err);
 }
 */
-kitchen.authenticate("jason", "jason");
+
+//kitchen.authenticate("jason", "jason");
+
 /*kitchen.authenticate("jason");
 kitchen.getorder("tableNum", 31).then(resp => {
 	console.log(order);
