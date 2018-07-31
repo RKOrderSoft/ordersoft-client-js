@@ -310,6 +310,7 @@ while (loggedIn == false) {
 	}
 }
 /* HENRY uSE THIS
+try {
 	orders = [];
 	kitchen.openOrders().then(resp => {
 		resp.forEach(element => {
