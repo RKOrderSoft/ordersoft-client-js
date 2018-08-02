@@ -30,9 +30,6 @@ class orderSoftClient {
 	requestFromServer(postUrl, body, type) {
 		var status;
 
-		console.log("req");
-		console.log(body);
-
 		return fetch(urlEndPoint + "/" + postUrl, {
 			method : type,
 			headers : {
@@ -42,7 +39,6 @@ class orderSoftClient {
 			},
 			body : JSON.stringify(body)
 		}).then(resp => {
-			console.log("reqested");
 			status = resp.status.toString();
 			return resp.json();
 		}).then(resp => {
@@ -122,7 +118,6 @@ class orderSoftClient {
 				"tableNum" : referenceNum
 			};
 		} else if (reference == "orderId") {
-			console.log("3");
 			var objToSend = {
 				"orderId" : referenceNum
 			};
@@ -144,28 +139,35 @@ class orderSoftClient {
 	order. if tableNum or orderId is already in the database, will
 	change the order. returns response from server
 	*/
-	submitOrder(order) {
+	// DONE
+	// NOT TESTED
+	setOrder(order) {
 		// error handling
+		console.log(order);
 		var undef = false
-		if (order.tableNum == undefined) {
+		if (order.tableNumber == undefined) {
+			console.log(order.tableNum);
+			console.log("1");
 			undef = true
 		} else if (order.orderId != undefined) {
+			console.log("2");
 			undef = false
 		} else {
+			console.log("3");
 			undef = false
 		}
 		if (undef == true) {
 			throw "orderId or tableNum must be defined in order";
 		}
 
-		return requestFromServer("order", order, "POST");
+		return this.requestFromServer("setOrder", order, "POST");
 	}
 
 
 
 	// given a reference of either "tableNum" or "orderId" and then
 	// the reference number, returns response from server
-	// NOT DONE, might be exact same as submitOrder?
+	// NOT DONE, might be exact same as setOrder?
 	// NOT TESTED
 	markOrderMade(reference, referenceNum) {
 		if (reference == "tableNum") {
@@ -240,7 +242,17 @@ kitchen.testPost().then(resp => {
 	console.log(resp);
 });
 
-kitchen.authenticate("name", "jeff");
+kitchen.authenticate("name", "jeff")
+
+setTimeout(() => {
+	kitchen.getOrder("orderId","f4Ke-Uu2D").then(resp => {
+		var order1 = resp.order;
+		console.log(order1);
+		order1.dishes = "13";
+		kitchen.setOrder(order1);
+	});
+}, 1000);
+
 
 
 /* HENRY uSE THIS, openOrders and getOrder
