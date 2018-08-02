@@ -30,6 +30,9 @@ class orderSoftClient {
 	requestFromServer(postUrl, body, type) {
 		var status;
 
+		console.log("req");
+		console.log(body);
+
 		return fetch(urlEndPoint + "/" + postUrl, {
 			method : type,
 			headers : {
@@ -39,6 +42,7 @@ class orderSoftClient {
 			},
 			body : JSON.stringify(body)
 		}).then(resp => {
+			console.log("reqested");
 			status = resp.status.toString();
 			return resp.json();
 		}).then(resp => {
@@ -63,11 +67,11 @@ class orderSoftClient {
 	// DONE
 	// TESTED
 	testPost() {
-		var test = {
+		var objToSend = {
 			"test" : true
 		};
 
-		return this.requestFromServer("test", test, "POST");
+		return this.requestFromServer("test", objToSend, "POST");
 	}
 
 
@@ -89,6 +93,7 @@ class orderSoftClient {
 			this._accessLevel = resp.accessLevel;
 			return resp;
 		}).catch((err) => {
+			console.log(err);
 			return err;
 		});
 	}
@@ -96,7 +101,7 @@ class orderSoftClient {
 	// logs out
 	// NOT TESTED
 	logout() {
-		this.requestFromServer("logout", , "POST").then(resp => {
+		this.requestFromServer("logout", {} , "POST").then(resp => {
 			this._sessionID = undefined;
 			this._accessLevel = undefined;
 			return resp;
@@ -110,29 +115,26 @@ class orderSoftClient {
 	// given a reference of either "tableNum" or "orderId" and then
 	// the reference number, returns response from server
 	// DONE
-	// NOT TESTED
+	// TESTED
 	getOrder(reference, referenceNum) {
 		if (reference == "tableNum") {
 			var objToSend = {
 				"tableNum" : referenceNum
-			}
-		} else if (reference = "orderId") {
+			};
+		} else if (reference == "orderId") {
+			console.log("3");
 			var objToSend = {
 				"orderId" : referenceNum
-			}
+			};
 		} else {
 			throw "must specify 'tableNum' or 'orderId' in first parameter";
 		}
 
-		return this.requestFromServer("order", objToSend, "GET");
-		/*requestFromServer("order", objectToSend).then(resp => {
-			return resp;
-		});*/
+		return this.requestFromServer("getOrder", objToSend, "POST");
 	}
 
 	openOrders() {
-		objToSend = {}
-		return this.requestFromServer("order", objToSend, "POST");
+		return this.requestFromServer("openOrders", {}, "POST");
 	}
 
 	/*
@@ -228,90 +230,20 @@ class orderSoftClient {
 
 		return requestFromServer("dishes", objToSend, "GET");
 	}
-
-
-
-	// adds dish to database given name, price, sizes, category
-	// description, multiOptions and singleOptions
-	// DONE
-	// NOT TESTED
-	addDish(name, price, sizes, category, description, /*image, */multiOptions, singleOptions) {
-		var objToSend = {
-			"name" : name,
-			"price" : price,
-			"sizes" : sizes,
-			"category" : category,
-			"description" : description,
-			"multiOptions" : multiOptions,
-			"singleOptions" :singleOptions
-		}
-
-		return requestFromServer("dishes", objToSend, "POST");
-	}
-
-
-
-	// NOT DONE, might be same as editDish
-	// NOT TESTED
-	editDish(name, itemToChange, change) {
-		var objectToSend = {
-			"name" : name,
-			"itemToChange" : edit,
-			"change" : change
-		};
-
-		requestFromServer("editDish", objectToSend).then(resp => {
-			status = handleResponse(resp);
-			console.log("editDish status:");
-			console.log(status);
-			return resp;
-		})
-	}
-
-
-	// KINDA DONE, may need security
-	// NOT TESTED
-	register(username, password) {
-		var objectToSend = {
-			"username" : username,
-			"password" : password
-		}
-
-		return requestFromServer("admin", objToSend, "POST");
-	}
 }
 
 // testing below
 
-/*
+
 const kitchen = new orderSoftClient();
 kitchen.testPost().then(resp => {
 	console.log(resp);
 });
 
-var loggedIn = false;
-var error = false;
-var userName = prompt("username");
-var pw = prompt("pw");
-while (loggedIn == false) {
-	try {
-		error = false;
-		kitchen.authenticate(userName, pw);
-	} catch(err) {
-		console.log(err);
-		error = true
-	} finally {
-		if (error == true) {
-			username = prompt("username");
-			pw = prompt("pw");
-		} else {
-			loggedIn = true;
-		}
-	}
-}
-*/
+kitchen.authenticate("name", "jeff");
 
-/* HENRY uSE THIS
+
+/* HENRY uSE THIS, openOrders and getOrder
 try {
 	orders = [];
 	kitchen.openOrders().then(resp => {
@@ -325,12 +257,3 @@ try {
 	console.log(err);
 }
 */
-
-//kitchen.authenticate("jason", "jason");
-
-/*kitchen.authenticate("jason");
-kitchen.getorder("tableNum", 31).then(resp => {
-	console.log(order);
-});*/
-
-//kitchen.authenticate("jason", "jason");
