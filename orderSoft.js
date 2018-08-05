@@ -237,12 +237,12 @@ class orderSoftClient {
 // testing below
 
 
-const kitchen = new orderSoftClient();
+/*const kitchen = new orderSoftClient();
 kitchen.testPost().then(resp => {
 	console.log(resp);
 });
 
-kitchen.authenticate("name", "jeff")
+kitchen.authenticate("name", "jeff")*/
 
 /*
 setTimeout(() => {
