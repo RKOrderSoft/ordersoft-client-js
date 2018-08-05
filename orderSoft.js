@@ -244,6 +244,7 @@ kitchen.testPost().then(resp => {
 
 kitchen.authenticate("name", "jeff")
 
+/*
 setTimeout(() => {
 	kitchen.getOrder("orderId","f4Ke-Uu2D").then(resp => {
 		var order1 = resp.order;
@@ -251,21 +252,22 @@ setTimeout(() => {
 		order1.dishes = "13";
 		kitchen.setOrder(order1);
 	});
-}, 1000);
+}, 1000);*/
 
 
-
-/* HENRY uSE THIS, openOrders and getOrder
+/* henry this works, tested it, it returns an array of orders using the openOrders and getOrder methods
 try {
 	orders = [];
+	var numOrders = 0;
 	kitchen.openOrders().then(resp => {
-		resp.forEach(element => {
-			kitchen.getOrder("orderID", element).then(resp => {
-				orders.push(resp);
-			});
-		});
-	}
+		var orderIds = resp.openOrders;
+		numOrders = orderIds.length;
+		for (var i = 0; i < numOrders; i++) {
+			kitchen.getOrder("orderId", orderIds[i].orderId).then(order => {
+				orders.push(order);
+			})
+		}
+	});
 } catch(err) {
 	console.log(err);
-}
-*/
+}*/
