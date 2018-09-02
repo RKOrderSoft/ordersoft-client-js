@@ -5,6 +5,7 @@ class orderSoftClient {
 		this._accessLevel;
 		this._urlEndPoint = "http://localhost:8080/api"; // url
 		this._client = "js";
+		// status may not be needed anymore
 		this._status_OK = "OK";
 		this._status_INVALID = "INVALID";
 		this._status_SESSION_EXPIRED = "SESSION_EXPIRED";
@@ -21,10 +22,16 @@ class orderSoftClient {
 		return this._accessLevel;
 	}
 
+	// pads single digit numbers for dates
+	pad(num) {
+    	if (num < 10) {
+        	return "0" + num.toString();
+    	}
+    	return num.toString();
+	}
 
-	// given the URL and body
 	// helper function for fetching from server
-	// postURL is string, body is JSO
+	// postURL is string, body is JSO, type is request type
 	requestFromServer(postUrl, body, type) {
 		var status;
 
@@ -51,13 +58,9 @@ class orderSoftClient {
 				}
 			}
 		});
-			/*
-			return response.json();
-		}).then(resp => {
-			return JSON.parse(resp);
-		})*/
 	}
 
+	// test post, returns the response from server
 	// DONE & TESTED
 	testPost() {
 		var objToSend = {
@@ -72,8 +75,7 @@ class orderSoftClient {
 	// given a username and password returns response from server
 	// if login is successful then the session ID and access level
 	// will be set
-	// DONE?
-	// SEEMS TO WORK
+	// DONE AND SEEMS TO WORK
 	authenticate(username, password) {
 		var loginDetails = {
 			"username" : username,
@@ -91,24 +93,18 @@ class orderSoftClient {
 		});
 	}
 
-	// logs out
-	// NOT TESTED
+	// logs out, clearing session ID and access level
+	// DONE & TESTED
 	logout() {
-		this.requestFromServer("logout", {} , "POST").then(resp => {
-			this._sessionID = undefined;
-			this._accessLevel = undefined;
-			return resp;
-		}).catch((err) => {
-			return err;
-		});
+		this._sessionID = undefined;
+		this._accessLevel = undefined;
 	}
 
 
 
 	// given a reference of either "tableNumber" or "orderId" and then
 	// the reference number, returns response from server
-	// DONE
-	// TESTED
+	// DONE & TESTED
 	getOrder(reference, referenceNum) {
 		if (reference == "tableNumber") {
 			var objToSend = {
@@ -128,6 +124,8 @@ class orderSoftClient {
 	// returns response from server
 	// response contains field openOrders, array of orderId (strings)
 	// of orders that are not yet complete
+	// DONE
+	// TESTED
 	openOrders() {
 		return this.requestFromServer("openOrders", {}, "POST");
 	}
@@ -139,8 +137,7 @@ class orderSoftClient {
 	order. if tableNum or orderId is already in the database, will
 	change the order. returns response from server
 	*/
-	// DONE
-	// TESTED
+	// DONE & TESTED
 	setOrder(order) {
 		// error handling
 		console.log(order);
@@ -171,40 +168,42 @@ class orderSoftClient {
 
 	// given a reference of either "tableNum" or "orderId" and then
 	// the reference number, returns response from server
-	// NOT DONE, can be done using setOrder
-	// NOT TESTED
+	// DONE & TESTED
     markOrderMade(reference, referenceNum) {
         this.getOrder(reference, referenceNum).then(resp => {
             var orderToChange = resp.order;
-            orderToChange.timeCompleted = new DateTime(DateTime.Now());
+
+            // date formatting
+            var time = new Date(Date.now());
+            time.setMinutes(time.getMinutes() + time.getTimezoneOffset());
+            var timeString = time.getFullYear().toString() + "-" + this.pad(time.getMonth()).toString() + "-" + this.pad(time.getDate()).toString() + " " + this.pad(time.getHours()).toString() + ":" + this.pad(time.getMinutes()).toString() + ":" + this.pad(time.getSeconds()).toString();
+            
+            orderToChange.timeCompleted = timeString;
             return this.setOrder(orderToChange);
         }).then(resp => {
-            // do stuff
+            console.log(resp);
         })
     }
 
 
 
 
-	// returns all dishes in database
-	// NOT TESTED
-	getDishes() {
-		/*var objToSend {
-			"" : 
-		}*/
-
-		return requestFromServer("dishes", objToSend, "GET");
+	// given optional parameters returns response from server with
+	// dishes from database
+	// DONE & TESTED
+	getDishes(parameters) {
+		return this.requestFromServer("getDishes", parameters, "POST");
 	}
 }
 
 // testing below
 
-
+/*
 const kitchen = new orderSoftClient();
 kitchen.testPost().then(resp => {
 	console.log(resp);
 });
-
+*/
 
 
 /*
@@ -218,7 +217,7 @@ setTimeout(() => {
 }, 1000);*/
 
 
-kitchen.authenticate("JasonXiao", "glasses");
+//kitchen.authenticate("JasonXiao", "glasses");
 
 /*setTimeout(() => {
 	kitchen.getOrder("tableNum", 4).then(resp => {
