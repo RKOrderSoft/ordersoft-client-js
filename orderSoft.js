@@ -1,18 +1,14 @@
-const urlEndPoint = "http://localhost:8080/api"; // url
-const client = "js";
-const status_OK = "OK";
-const status_INVALID = "INVALID";
-const status_SESSION_EXPIRED = "SESSION_EXPIRED";
-const status_UNAUTHORISED = "UNAUTHORISED";
-
-// helper function for fetching from server
-// postURL is string, body is javascript object
-
 class orderSoftClient {
 
 	constructor() {
 		this._sessionID;
 		this._accessLevel;
+		this._urlEndPoint = "http://localhost:8080/api"; // url
+		this._client = "js";
+		this._status_OK = "OK";
+		this._status_INVALID = "INVALID";
+		this._status_SESSION_EXPIRED = "SESSION_EXPIRED";
+		this._status_UNAUTHORISED = "UNAUTHORISED";
 	}
 
 
@@ -27,14 +23,16 @@ class orderSoftClient {
 
 
 	// given the URL and body
+	// helper function for fetching from server
+	// postURL is string, body is JSO
 	requestFromServer(postUrl, body, type) {
 		var status;
 
-		return fetch(urlEndPoint + "/" + postUrl, {
+		return fetch(this._urlEndPoint + "/" + postUrl, {
 			method : type,
 			headers : {
 				"content-type" : "application/json",
-				"client" : client,
+				"client" : this._client,
 				"sessionId" : this._sessionID
 			},
 			body : JSON.stringify(body)
@@ -60,8 +58,7 @@ class orderSoftClient {
 		})*/
 	}
 
-	// DONE
-	// TESTED
+	// DONE & TESTED
 	testPost() {
 		var objToSend = {
 			"test" : true
@@ -75,8 +72,8 @@ class orderSoftClient {
 	// given a username and password returns response from server
 	// if login is successful then the session ID and access level
 	// will be set
-	// NOT DONE
-	// NOT TESTED
+	// DONE?
+	// SEEMS TO WORK
 	authenticate(username, password) {
 		var loginDetails = {
 			"username" : username,
@@ -108,26 +105,29 @@ class orderSoftClient {
 
 
 
-	// given a reference of either "tableNum" or "orderId" and then
+	// given a reference of either "tableNumber" or "orderId" and then
 	// the reference number, returns response from server
 	// DONE
 	// TESTED
 	getOrder(reference, referenceNum) {
-		if (reference == "tableNum") {
+		if (reference == "tableNumber") {
 			var objToSend = {
-				"tableNum" : referenceNum
+				"tableNumber" : referenceNum
 			};
 		} else if (reference == "orderId") {
 			var objToSend = {
 				"orderId" : referenceNum
 			};
 		} else {
-			throw "must specify 'tableNum' or 'orderId' in first parameter";
+			throw "must specify 'tableNumber' or 'orderId' in first parameter";
 		}
 
 		return this.requestFromServer("getOrder", objToSend, "POST");
 	}
 
+	// returns response from server
+	// response contains field openOrders, array of orderId (strings)
+	// of orders that are not yet complete
 	openOrders() {
 		return this.requestFromServer("openOrders", {}, "POST");
 	}
@@ -140,7 +140,7 @@ class orderSoftClient {
 	change the order. returns response from server
 	*/
 	// DONE
-	// NOT TESTED
+	// TESTED
 	setOrder(order) {
 		// error handling
 		console.log(order);
@@ -157,74 +157,37 @@ class orderSoftClient {
 			undef = false
 		}
 		if (undef == true) {
-			throw "orderId or tableNum must be defined in order";
+			throw "orderId or tableNumber must be defined in order";
 		}
 
-		return this.requestFromServer("setOrder", order, "POST");
+		var objToSend = {
+			"order" : order
+		};
+
+		return this.requestFromServer("setOrder", objToSend, "POST");
 	}
 
 
 
 	// given a reference of either "tableNum" or "orderId" and then
 	// the reference number, returns response from server
-	// NOT DONE, might be exact same as setOrder?
+	// NOT DONE, can be done using setOrder
 	// NOT TESTED
-	markOrderMade(reference, referenceNum) {
-		if (reference == "tableNum") {
-			var objToSend = {
-				"tableNum" : referenceNum
-			}
-		} else if (reference = "orderId") {
-			var objToSend = {
-				"orderId" : referenceNum
-			}
-		} else {
-			throw "must specify 'tableNum' or 'orderId' in first parameter";
-		}
+    markOrderMade(reference, referenceNum) {
+        this.getOrder(reference, referenceNum).then(resp => {
+            var orderToChange = resp.order;
+            orderToChange.timeCompleted = new DateTime(DateTime.Now());
+            return this.setOrder(orderToChange);
+        }).then(resp => {
+            // do stuff
+        })
+    }
 
-		requestFromServer("order", objToSend, "POST");
-	}
-
-
-
-	// might not need this? not in data dict
-	// NOT DONE
-	// NOT TESTED
-	markDishMade(tableNum, dish) {
-		var objectToSend = {
-			"tableNum" : tableNum,
-			"dish" : dish
-		};
-
-		requestFromServer("markDishMade", objectToSend).then(resp => {
-			status = handleResponse(resp);
-			console.log("markDishMade status:");
-			console.log(status);
-			return resp;
-		});
-	}
-
-
-
-	// NOT DONE, might not need as exact same as markorderdone
-	// NOT TESTED
-	markOrderPaid(tableNum) {
-		var objectToSend = {
-			"tableNum" : tableNum,
-			"dish" : dish
-		};
-
-		requestFromServer("markOrderPaid", objectToSend).then(resp => {
-			status = handleResponse(resp);
-			console.log("markDishMade status:");
-			console.log(status);
-			return resp;
-		});
-	}
 
 
 
 	// returns all dishes in database
+	// NOT TESTED
 	getDishes() {
 		/*var objToSend {
 			"" : 
@@ -237,12 +200,12 @@ class orderSoftClient {
 // testing below
 
 
-/*const kitchen = new orderSoftClient();
+const kitchen = new orderSoftClient();
 kitchen.testPost().then(resp => {
 	console.log(resp);
 });
 
-kitchen.authenticate("name", "jeff")*/
+
 
 /*
 setTimeout(() => {
@@ -255,19 +218,34 @@ setTimeout(() => {
 }, 1000);*/
 
 
-/* henry this works, tested it, it returns an array of orders using the openOrders and getOrder methods
+kitchen.authenticate("JasonXiao", "glasses");
+
+/*setTimeout(() => {
+	kitchen.getOrder("tableNum", 4).then(resp => {
+		orderToSend = resp.order;
+		orderToSend.dishes = 5;
+		kitchen.setOrder(orderToSend);
+
+	})
+}, 1000);*/
+
+
+// henry this works, tested it, it returns an array of orders using the openOrders and getOrder methods
+/*
 try {
+
 	orders = [];
 	var numOrders = 0;
 	kitchen.openOrders().then(resp => {
 		var orderIds = resp.openOrders;
 		numOrders = orderIds.length;
 		for (var i = 0; i < numOrders; i++) {
-			kitchen.getOrder("orderId", orderIds[i].orderId).then(order => {
+			kitchen.getOrder("orderId", orderIds[i]).then(order => {
 				orders.push(order);
 			})
 		}
 	});
 } catch(err) {
 	console.log(err);
-}*/
+}
+*/
