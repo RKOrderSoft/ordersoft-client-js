@@ -3,13 +3,8 @@ class orderSoftClient {
 	constructor() {
 		this._sessionID;
 		this._accessLevel;
-		this._urlEndPoint = "http://localhost:8080/api"; // url
+		this._urlEndPoint;
 		this._client = "js";
-		// status may not be needed anymore
-		this._status_OK = "OK";
-		this._status_INVALID = "INVALID";
-		this._status_SESSION_EXPIRED = "SESSION_EXPIRED";
-		this._status_UNAUTHORISED = "UNAUTHORISED";
 	}
 
 
@@ -33,6 +28,8 @@ class orderSoftClient {
 	// helper function for fetching from server
 	// postURL is string, body is JSO, type is request type
 	requestFromServer(postUrl, body, type) {
+		if (this._urlEndPoint === undefined) throw Error("No url endpoint - run init() first!");
+
 		var status;
 
 		return fetch(this._urlEndPoint + "/" + postUrl, {
@@ -62,12 +59,20 @@ class orderSoftClient {
 
 	// test post, returns the response from server
 	// DONE & TESTED
-	testPost() {
+	async init(ip) {
 		var objToSend = {
 			"test" : true
 		};
 
-		return this.requestFromServer("test", objToSend, "POST");
+		this._urlEndPoint = ip + "api";
+
+		try {
+			await this.requestFromServer("test", objToSend, "POST");
+		} catch (e) {
+			this._urlEndPoint = undefined;
+			throw Error(ip + " is not an ordersoft server");
+		}
+
 	}
 
 
