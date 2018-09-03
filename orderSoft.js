@@ -59,19 +59,22 @@ class orderSoftClient {
 
 	// test post, returns the response from server
 	// DONE & TESTED
-	async init(ip) {
+	init(ip) {
 		var objToSend = {
 			"test" : true
 		};
 
 		this._urlEndPoint = ip + "api";
 
-		try {
-			await this.requestFromServer("test", objToSend, "POST");
-		} catch (e) {
-			this._urlEndPoint = undefined;
-			throw Error(ip + " is not an ordersoft server");
-		}
+		return new Promise(async (resolve, cancel) => {
+			try {
+				await this.requestFromServer("test", objToSend, "POST");
+				resolve()
+			} catch (e) {
+				this._urlEndPoint = undefined;
+				throw Error(ip + " is not an ordersoft server");
+			}
+		});
 
 	}
 
