@@ -69,7 +69,7 @@ class orderSoftClient {
 		return new Promise(async (resolve, cancel) => {
 			try {
 				await this.requestFromServer("test", objToSend, "POST");
-				resolve()
+				resolve();
 			} catch (e) {
 				this._urlEndPoint = undefined;
 				throw Error(ip + " is not an ordersoft server");
