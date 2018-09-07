@@ -32,6 +32,7 @@ class orderSoftClient {
 
 		var status;
 
+		// fetches from server using IP obtained from init
 		return fetch(this._urlEndPoint + "/" + postUrl, {
 			method : type,
 			headers : {
@@ -58,7 +59,6 @@ class orderSoftClient {
 	}
 
 	// test post, returns the response from server
-	// DONE & TESTED
 	init(ip) {
 		var objToSend = {
 			"test" : true
@@ -83,7 +83,6 @@ class orderSoftClient {
 	// given a username and password returns response from server
 	// if login is successful then the session ID and access level
 	// will be set
-	// DONE AND SEEMS TO WORK
 	authenticate(username, password) {
 		var loginDetails = {
 			"username" : username,
@@ -97,12 +96,11 @@ class orderSoftClient {
 			return resp;
 		}).catch((err) => {
 			console.log(err);
-			return err;
+			throw err;
 		});
 	}
 
 	// logs out, clearing session ID and access level
-	// DONE & TESTED
 	logout() {
 		this._sessionID = undefined;
 		this._accessLevel = undefined;
@@ -112,7 +110,6 @@ class orderSoftClient {
 
 	// given a reference of either "tableNumber" or "orderId" and then
 	// the reference number, returns response from server
-	// DONE & TESTED
 	getOrder(reference, referenceNum) {
 		if (reference == "tableNumber") {
 			var objToSend = {
@@ -132,20 +129,14 @@ class orderSoftClient {
 	// returns response from server
 	// response contains field openOrders, array of orderId (strings)
 	// of orders that are not yet complete
-	// DONE
-	// TESTED
 	openOrders() {
 		return this.requestFromServer("openOrders", {}, "POST");
 	}
 
-	/*
-	incorporates both change and submit order
-	given an order in JSON, will change/submit order to database
-	if tableNum or orderId is not in the database, will make a new
-	order. if tableNum or orderId is already in the database, will
-	change the order. returns response from server
-	*/
-	// DONE & TESTED
+	// given an order in JSON, will change/submit order to database
+	// if tableNum or orderId is not in the database, will make a new
+	// order. if tableNum or orderId is already in the database, will
+	// change the order. returns response from server
 	setOrder(order) {
 		// error handling
 		console.log(order);
@@ -176,7 +167,6 @@ class orderSoftClient {
 
 	// given a reference of either "tableNum" or "orderId" and then
 	// the reference number, returns response from server
-	// DONE & TESTED
     markOrderMade(reference, referenceNum) {
         this.getOrder(reference, referenceNum).then(resp => {
             var orderToChange = resp.order;
@@ -198,61 +188,7 @@ class orderSoftClient {
 
 	// given optional parameters returns response from server with
 	// dishes from database
-	// DONE & TESTED
 	getDishes(parameters) {
 		return this.requestFromServer("getDishes", parameters, "POST");
 	}
 }
-
-// testing below
-
-/*
-const kitchen = new orderSoftClient();
-kitchen.testPost().then(resp => {
-	console.log(resp);
-});
-*/
-
-
-/*
-setTimeout(() => {
-	kitchen.getOrder("orderId","f4Ke-Uu2D").then(resp => {
-		var order1 = resp.order;
-		console.log(order1);
-		order1.dishes = "13";
-		kitchen.setOrder(order1);
-	});
-}, 1000);*/
-
-
-//kitchen.authenticate("JasonXiao", "glasses");
-
-/*setTimeout(() => {
-	kitchen.getOrder("tableNum", 4).then(resp => {
-		orderToSend = resp.order;
-		orderToSend.dishes = 5;
-		kitchen.setOrder(orderToSend);
-
-	})
-}, 1000);*/
-
-
-// henry this works, tested it, it returns an array of orders using the openOrders and getOrder methods
-/*
-try {
-
-	orders = [];
-	var numOrders = 0;
-	kitchen.openOrders().then(resp => {
-		var orderIds = resp.openOrders;
-		numOrders = orderIds.length;
-		for (var i = 0; i < numOrders; i++) {
-			kitchen.getOrder("orderId", orderIds[i]).then(order => {
-				orders.push(order);
-			})
-		}
-	});
-} catch(err) {
-	console.log(err);
-}
-*/
