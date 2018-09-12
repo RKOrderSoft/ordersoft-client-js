@@ -18,13 +18,18 @@ Returns promise. Response contains field openOrders, an array of orderIds (strin
 
 Given a reference (string, either "tableNumber" or "orderId"), will retrieve order corresponding with the tableNumber or orderId. Returns promise with response from the server.
 
+The below example retrieves the order by table number. Using the specified table number of 4.
+```javascript
+getOrder("tableNumber", 4);
+```
+
 * `setOrder(order)`
 
 Given an order in JSON, will submit the order to the database. If the table number or order ID is not in the database, it will make a new order. If the table number or order ID is already in the database, it will update the order. Returns promise with response from the server.
 
 * `markOrderMade(reference, referenceNum)`
 
-Given a reference (string, either "tableNumber" or "orderId"), will mark the order as made. Returnes promise with response from the server.
+Given a reference (string, either "tableNumber" or "orderId"), will mark the order as made. See getOrder example. Returnes promise with response from the server.
 
 * `getDishes(parameters)`
 
