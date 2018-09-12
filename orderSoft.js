@@ -167,8 +167,8 @@ class orderSoftClient {
 
             // date formatting
             var time = new Date(Date.now());
-            time.setMinutes(time.getMinutes() + time.getTimezoneOffset());
-            var timeString = time.getFullYear().toString() + "-" + this.pad(time.getMonth()).toString() + "-" + this.pad(time.getDate()).toString() + " " + this.pad(time.getHours()).toString() + ":" + this.pad(time.getMinutes()).toString() + ":" + this.pad(time.getSeconds()).toString();
+            time.setMinutes(time.getMinutes());
+            var timeString = time.getFullYear().toString() + "-" + this.pad(time.getMonth()+1).toString() + "-" + this.pad(time.getDate()).toString() + " " + this.pad(time.getHours()).toString() + ":" + this.pad(time.getMinutes()).toString() + ":" + this.pad(time.getSeconds()).toString();
             
             orderToChange.timeCompleted = timeString;
             return this.setOrder(orderToChange);
