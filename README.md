@@ -14,6 +14,10 @@ Logs out, clearing access level and session ID. Returns promise with response fr
 
 Returns promise. Response contains field openOrders, an array of orderIds (strings) of orders that are not complete. Returns promise with response from the server.
 
+* `unpaidOrders()`
+
+Returns promise. Response contains field unpaidOrders, an array of orderIds (strings) of orders that are complete but not yet paid. Returns promise with response from the server.
+
 * `getOrder(reference, referenceNumber)`
 
 Given a reference (string, either "tableNumber" or "orderId"), will retrieve order corresponding with the tableNumber or orderId. Returns promise with response from the server.
