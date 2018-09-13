@@ -127,6 +127,13 @@ class orderSoftClient {
 		return this.requestFromServer("openOrders", {}, "POST");
 	}
 
+	// returns response from server
+	// response contains field unpaidOrders, array of orderId (strings)
+	// of orders that are not yet complete
+	unpaidOrders() {
+		return this.requestFromServer("unpaidOrders", {}, "POST");
+	}
+
 	// given an order in JSON, will change/submit order to database
 	// if tableNum or orderId is not in the database, will make a new
 	// order. if tableNum or orderId is already in the database, will
